@@ -254,6 +254,42 @@ module FrankHelper
     end
   end
 
+  # grab a screenshot of the application under automation and save it to the specified file.
+  # Then embed the screenshot for cucumber reporters
+  #
+  # @param options [Hash] options for screenshot valid keys are
+  #   :prefix optional prefix to save file (default current dir)
+  #   :name optional name for file (default "screenshot")
+  #   :label optional label for test report (default filename)
+  #   :all_windows see frankly_screenshot (default true)
+  #   :subframe see frankly_screenshot (default false)
+  def screenshot_embed(options={:prefix => nil,
+                                :name => nil,
+                                :label => nil,
+                                :all_windows => true,
+                                :subframe => nil})
+    prefix = options[:prefix]
+    name = options[:name]
+    all_windows = options.has_key?(:all_windows) ? options[:all_windows] : true
+
+    @@screenshot_count ||= 0
+
+    prefix = prefix || ENV['SCREENSHOT_PATH'] || ""
+    if name.nil?
+      name = "screenshot"
+    else
+      if File.extname(name).downcase == ".png"
+        name = name.split(".png")[0]
+      end
+    end
+
+    path = "#{prefix}#{name}_#{@@screenshot_count}.png"
+    frankly_screenshot(path,options[:subframe],all_windows)
+    @@screenshot_count += 1
+    embed(path, "image/png", options[:label] || File.basename(path))
+    path
+  end
+
   # @return [Boolean] true if the device running the application currently in a portrait orientation
   # @note wil return false if the device is in a flat or unknown orientation. Sometimes the iOS simulator will report this state when first launched.
   def frankly_oriented_portrait?
