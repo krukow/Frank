@@ -252,6 +252,7 @@ module FrankHelper
     open(filename, "wb") do |file|
       file.write(data)
     end
+    filename
   end
 
   # grab a screenshot of the application under automation and save it to the specified file.
@@ -284,7 +285,7 @@ module FrankHelper
     end
 
     path = "#{prefix}#{name}_#{@@screenshot_count}.png"
-    frankly_screenshot(path,options[:subframe],all_windows)
+    path=frankly_screenshot(path,options[:subframe],all_windows)
     @@screenshot_count += 1
     embed(path, "image/png", options[:label] || File.basename(path))
     path
